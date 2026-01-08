@@ -78,7 +78,7 @@
     window.SUPABASE_URL = ''; // 実際のSupabase URLを設定
     window.SUPABASE_ANON_KEY = ''; // 実際のSupabase Anon Keyを設定
     window.ADMIN_EMAILS = ''; // 管理者メールアドレス（カンマ区切り）
-    window.API_BASE_URL = ''; // 実際のAPI URLを設定
+    window.API_BASE_URL = 'https://rag-system-api-1767894099.azurewebsites.net/api'; // Azure Functions API URL
 
     // 認証チェック（管理者のみ）
     requireAuth().then(async isAuthenticated => {

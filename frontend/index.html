@@ -49,7 +49,7 @@
     // 設定（実際の実装では環境変数や設定ファイルから読み込む）
     window.SUPABASE_URL = ''; // 実際のSupabase URLを設定
     window.SUPABASE_ANON_KEY = ''; // 実際のSupabase Anon Keyを設定
-    window.API_BASE_URL = ''; // 実際のAPI URLを設定
+    window.API_BASE_URL = 'https://rag-system-api-1767894099.azurewebsites.net/api'; // Azure Functions API URL
 
     // 認証チェック
     requireAuth().then(isAuthenticated => {
