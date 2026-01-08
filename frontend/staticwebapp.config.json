@@ -1,32 +1,18 @@
 {
-  "routes": [
-    {
-      "route": "/login.html",
-      "rewrite": "/login.html"
-    },
-    {
-      "route": "/admin.html",
-      "rewrite": "/admin.html"
-    },
-    {
-      "route": "/",
-      "rewrite": "/index.html"
-    },
-    {
-      "route": "/*",
-      "statusCode": 404,
-      "rewrite": "/index.html"
-    }
-  ],
-  "navigationFallback": {
-    "rewrite": "/index.html",
-    "exclude": ["/api/*", "*.{css,scss,js,png,gif,ico,jpg,svg,woff,woff2,ttf,eot}"]
-  },
-  "responseOverrides": {
-    "404": {
+    "routes": [
+      {
+        "route": "/api/*",
+        "rewrite": "/api"
+      }
+    ],
+    "navigationFallback": {
       "rewrite": "/index.html",
-      "statusCode": 200
+      "exclude": [
+        "/api/*",
+        "/login.html",
+        "/admin.html",
+        "*.{css,scss,js,png,gif,ico,jpg,svg,woff,woff2,ttf,eot}"
+      ]
     }
   }
-}
-
+  
