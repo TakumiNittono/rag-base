@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>管理画面 - RAG System</title>
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+  <header>
+    <div class="container">
+      <h1>RAG System - 管理画面</h1>
+      <nav>
+        <a href="/index.html" class="btn btn-secondary">チャット画面へ</a>
+        <button class="btn btn-secondary" id="logout-btn">ログアウト</button>
+      </nav>
+    </div>
+  </header>
+
+  <main class="container">
+    <div id="alert-message" class="alert" style="display: none;"></div>
+    
+    <!-- ファイルアップロード -->
+    <div class="card">
+      <div class="card-header">ファイルアップロード</div>
+      
+      <div id="upload-area" class="file-upload-area">
+        <input type="file" id="file-input" accept=".txt,.md,.pdf">
+        <p>ファイルをドラッグ&ドロップするか、クリックして選択</p>
+        <p style="font-size: 0.875rem; color: var(--secondary-color); margin-top: 0.5rem;">
+          対応形式: .txt, .md, .pdf（最大10MB）
+        </p>
+      </div>
+      
+      <button id="upload-button" class="btn btn-primary" style="width: 100%; margin-top: 1rem;">
+        アップロード
+      </button>
+    </div>
+    
+    <!-- ファイル一覧 -->
+    <div class="card">
+      <div class="card-header">
+        ファイル一覧
+        <select id="status-filter" style="float: right; padding: 0.25rem;">
+          <option value="">すべて</option>
+          <option value="uploaded">アップロード済み</option>
+          <option value="indexing">処理中</option>
+          <option value="indexed">完了</option>
+          <option value="error">エラー</option>
+        </select>
+      </div>
+      
+      <table>
+        <thead>
+          <tr>
+            <th>ファイル名</th>
+            <th>アップロード日時</th>
+            <th>ステータス</th>
+            <th>チャンク数 / Embedding数</th>
+            <th>操作</th>
+          </tr>
+        </thead>
+        <tbody id="files-tbody">
+          <tr>
+            <td colspan="5" style="text-align: center;">読み込み中...</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </main>
+
+  <!-- Supabaseクライアント -->
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="js/auth.js"></script>
+  <script src="js/admin.js"></script>
+  <script>
+    // 設定（実際の実装では環境変数や設定ファイルから読み込む）
+    window.SUPABASE_URL = ''; // 実際のSupabase URLを設定
+    window.SUPABASE_ANON_KEY = ''; // 実際のSupabase Anon Keyを設定
+    window.ADMIN_EMAILS = ''; // 管理者メールアドレス（カンマ区切り）
+    window.API_BASE_URL = ''; // 実際のAPI URLを設定
+
+    // 認証チェック（管理者のみ）
+    requireAuth().then(async isAuthenticated => {
+      if (!isAuthenticated) return;
+      
+      // 管理者チェック
+      const userIsAdmin = await isAdmin();
+      if (!userIsAdmin) {
+        alert('管理者権限が必要です');
+        window.location.href = '/index.html';
+        return;
+      }
+      
+      // 管理画面初期化
+      initAdmin();
+      
+      // ログアウトボタン
+      document.getElementById('logout-btn').addEventListener('click', async function() {
+        try {
+          await logout();
+          window.location.href = '/login.html';
+        } catch (error) {
+          alert('ログアウトに失敗しました: ' + error.message);
+        }
+      });
+    });
+  </script>
+</body>
+</html>
+

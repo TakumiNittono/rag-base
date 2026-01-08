@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>RAG検索 - RAG System</title>
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+  <header>
+    <div class="container">
+      <h1>RAG System</h1>
+      <nav>
+        <button class="btn btn-secondary" id="logout-btn">ログアウト</button>
+      </nav>
+    </div>
+  </header>
+
+  <main class="container">
+    <div class="card">
+      <div class="card-header">RAG検索</div>
+      
+      <div class="chat-container">
+        <div id="chat-messages" class="chat-messages">
+          <div class="message assistant">
+            <div class="message-header">アシスタント</div>
+            <div>こんにちは！質問を入力してください。</div>
+          </div>
+        </div>
+        
+        <form id="chat-form" class="chat-input-container">
+          <textarea 
+            id="message-input" 
+            placeholder="質問を入力してください..." 
+            rows="3"
+            required
+          ></textarea>
+          <button type="submit" class="btn btn-primary">送信</button>
+        </form>
+      </div>
+    </div>
+  </main>
+
+  <!-- Supabaseクライアント -->
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="js/auth.js"></script>
+  <script src="js/chat.js"></script>
+  <script>
+    // 設定（実際の実装では環境変数や設定ファイルから読み込む）
+    window.SUPABASE_URL = ''; // 実際のSupabase URLを設定
+    window.SUPABASE_ANON_KEY = ''; // 実際のSupabase Anon Keyを設定
+    window.API_BASE_URL = ''; // 実際のAPI URLを設定
+
+    // 認証チェック
+    requireAuth().then(isAuthenticated => {
+      if (!isAuthenticated) return;
+      
+      // チャット初期化
+      initChat();
+      
+      // ログアウトボタン
+      document.getElementById('logout-btn').addEventListener('click', async function() {
+        try {
+          await logout();
+          window.location.href = '/login.html';
+        } catch (error) {
+          alert('ログアウトに失敗しました: ' + error.message);
+        }
+      });
+    });
+  </script>
+</body>
+</html>
+

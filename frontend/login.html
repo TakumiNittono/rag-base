@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>ログイン - RAG System</title>
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+  <div class="container" style="max-width: 400px; margin-top: 100px;">
+    <div class="card">
+      <div class="card-header">ログイン</div>
+      
+      <div id="error-message" class="alert alert-error" style="display: none;"></div>
+      
+      <form id="login-form">
+        <div class="form-group">
+          <label for="email">メールアドレス</label>
+          <input type="email" id="email" name="email" required>
+        </div>
+        
+        <div class="form-group">
+          <label for="password">パスワード</label>
+          <input type="password" id="password" name="password" required>
+          <button type="button" id="toggle-password" style="margin-top: 0.5rem; font-size: 0.875rem; background: none; border: none; color: var(--primary-color); cursor: pointer;">
+            パスワードを表示
+          </button>
+        </div>
+        
+        <button type="submit" class="btn btn-primary" style="width: 100%;">
+          ログイン
+        </button>
+      </form>
+    </div>
+  </div>
+
+  <!-- Supabaseクライアント -->
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="js/auth.js"></script>
+  <script>
+    // 設定（実際の実装では環境変数や設定ファイルから読み込む）
+    window.SUPABASE_URL = ''; // 実際のSupabase URLを設定
+    window.SUPABASE_ANON_KEY = ''; // 実際のSupabase Anon Keyを設定
+
+    // 既にログインしている場合はリダイレクト
+    checkAuth().then(isAuthenticated => {
+      if (isAuthenticated) {
+        window.location.href = '/index.html';
+      }
+    });
+
+    // パスワード表示/非表示切り替え
+    document.getElementById('toggle-password').addEventListener('click', function() {
+      const passwordInput = document.getElementById('password');
+      const toggleButton = this;
+      
+      if (passwordInput.type === 'password') {
+        passwordInput.type = 'text';
+        toggleButton.textContent = 'パスワードを非表示';
+      } else {
+        passwordInput.type = 'password';
+        toggleButton.textContent = 'パスワードを表示';
+      }
+    });
+
+    // ログインフォーム送信
+    document.getElementById('login-form').addEventListener('submit', async function(e) {
+      e.preventDefault();
+      
+      const errorMessage = document.getElementById('error-message');
+      errorMessage.style.display = 'none';
+      
+      const email = document.getElementById('email').value;
+      const password = document.getElementById('password').value;
+      const submitButton = this.querySelector('button[type="submit"]');
+      
+      submitButton.disabled = true;
+      submitButton.textContent = 'ログイン中...';
+      
+      try {
+        await login(email, password);
+        window.location.href = '/index.html';
+      } catch (error) {
+        errorMessage.textContent = error.message || 'ログインに失敗しました';
+        errorMessage.style.display = 'block';
+      } finally {
+        submitButton.disabled = false;
+        submitButton.textContent = 'ログイン';
+      }
+    });
+  </script>
+</body>
+</html>
+
