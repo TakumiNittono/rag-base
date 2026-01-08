@@ -1,35 +1,82 @@
-__pycache__
-*.pyc
-*.pyo
-*.pyd
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
 .Python
 env/
 venv/
-.venv
-.env
-.venv
-pip-log.txt
-pip-delete-this-directory.txt
-.tox/
+.venv/
+ENV/
+env.bak/
+venv.bak/
+
+# Testing
+.pytest_cache/
 .coverage
 .coverage.*
-.cache
+htmlcov/
+.tox/
+.nox/
+.hypothesis/
 nosetests.xml
 coverage.xml
 *.cover
 *.log
-.git
-.mypy_cache
-.pytest_cache
-.hypothesis
+
+# IDEs
+.vscode/
+.idea/
 *.swp
 *.swo
 *~
 .DS_Store
-.vscode/
-.idea/
+
+# Build artifacts
 *.egg-info/
 dist/
 build/
+*.egg
+
+# Environment
+.env
+.env.local
+.env.*.local
+local.settings.json
+
+# Git
+.git/
+.gitignore
+
+# Documentation
+*.md
+docs/
+
+# Tests
 tests/
-.pytest_cache/
+test_*.py
+*_test.py
+
+# Development files
+*.md
+README*
+LICENSE*
+.gitignore
+.pylintrc
+.flake8
+.mypy.ini
+pyproject.toml
+
+# Large data files
+*.csv
+*.json
+*.parquet
+*.pickle
+*.pkl
+
+# NLTK data (will be downloaded at runtime)
+nltk_data/
+
+# LlamaIndex cache
+.llama_index/
+llama_index_cache/

@@ -193,43 +193,32 @@ cd /Users/takuminittono/Desktop/ragstudy/rag-base
 
 **注意**: 複数行のコマンドで`value: null`になる場合は、個別に設定するか、Azure Portalから設定してください
 
-### 5. デプロイ
+### 5. Azure Functionsデプロイ（独立したFunction Appとして）
+
+**重要**: Azure Static Web AppsのAPI機能（100MB制限）ではなく、独立したAzure Functionsとしてデプロイします。
 
 ```bash
-FUNCTION_APP_NAME=rag-system-api-1767894099  
-az functionapp config appsettings set \
-  --name $FUNCTION_APP_NAME \
-  --resource-group rag-system-rg \
-  --settings \
-    SUPABASE_URL="https://xxxxx.supabase.co" \
-    SUPABASE_ANON_KEY="eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..." \
-    SUPABASE_SERVICE_ROLE_KEY="eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..." \
-    SUPABASE_STORAGE_BUCKET="documents" \
-    DB_HOST="db.xxxxx.supabase.co" \
-    DB_PORT="5432" \
-    DB_NAME="postgres" \
-    DB_USER="postgres" \
-    DB_PASSWORD="your-db-password" \
-    OPENAI_API_KEY="sk-..." \
-    EMBEDDING_MODEL="text-embedding-3-small" \
-    CHAT_MODEL="gpt-4o-mini" \
-    CHUNK_SIZE="500" \
-    CHUNK_OVERLAP="50" \
-    TOP_K="5" \
-    ADMIN_EMAILS="admin@example.com" \
-    LOG_LEVEL="INFO" \
-    ALLOWED_ORIGINS="https://your-static-web-app.azurestaticapps.net" \
-    API_TIMEOUT="30" \
-    MAX_FILE_SIZE="10485760" \
-    ENVIRONMENT="production"
+FUNCTION_APP_NAME="rag-system-api-xxxxx"  # 実際のFunction App名に置き換え
+
 # 依存関係をインストール（仮想環境で）
+cd backend
 python3 -m venv venv
 source venv/bin/activate  # Windows: venv\Scripts\activate
 pip install -r requirements.txt
 
 # Azure Functionsにデプロイ
 func azure functionapp publish $FUNCTION_APP_NAME
+
+# デプロイ確認
+func azure functionapp list-functions $FUNCTION_APP_NAME
 ```
+
+**デプロイ後のURL確認**:
+```bash
+echo "API URL: https://${FUNCTION_APP_NAME}.azurewebsites.net/api"
+```
+
+このURLをフロントエンドの`window.API_BASE_URL`に設定してください。
 
 ### 6. CORS設定
 
@@ -264,15 +253,19 @@ az staticwebapp create \
   --resource-group rag-system-rg \
   --location japaneast \
   --sku Free \
-  --source https://github.com/your-username/rag-system \
+  --source https://github.com/TakumiNittono/rag-base \
   --branch main \
-  --app-location frontend \
-  --api-location backend
+  --app-location frontend
+  # 注意: api-locationは指定しない（独立したAzure Functionsとしてデプロイ）
 ```
 
 3. **GitHub Actionsが自動実行される**
-   - `.github/workflows/azure-static-web-apps-rag-system-web.yml`が自動生成
+   - `.github/workflows/azure-static-web-apps.yml`が自動生成されるか、手動で作成
+   - Azure Portal → Static Web App → **Manage deployment token**でトークンを取得
+   - GitHubリポジトリの**Settings** → **Secrets and variables** → **Actions**で`AZURE_STATIC_WEB_APPS_API_TOKEN`を設定
    - デプロイが完了するまで待つ（5-10分）
+
+**重要**: Azure Functionsは独立してデプロイする必要があります（サイズ制限のため）
 
 ### 方法2: SWA CLI（手動デプロイ）
 
@@ -480,6 +473,21 @@ az functionapp create \
   --name rag-system-api-$(date +%s) \
   --storage-account $STORAGE_ACCOUNT
 ```
+
+### 問題7: "The size of the function content was too large" エラー
+
+**原因**: Azure Static Web AppsのAPI機能には100MBの制限があります。LlamaIndexなどの大きな依存関係を含むアプリケーションには適していません。
+
+**解決方法**:
+1. Azure Static Web Appsの`--api-location`オプションを使用しない
+2. 独立したAzure Functionsとしてデプロイする（上記の手順5を参照）
+3. GitHub Actionsワークフローの`api_location`を空にする
+4. フロントエンドの`window.API_BASE_URL`を独立したAzure FunctionsのURLに設定する
+
+**確認事項**:
+- `.github/workflows/azure-static-web-apps.yml`の`api_location`が空になっているか
+- `az staticwebapp create`コマンドで`--api-location`を指定していないか
+- フロントエンドのHTMLファイルで`window.API_BASE_URL`が正しく設定されているか
 
 ---
 

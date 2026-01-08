@@ -28,7 +28,8 @@ jobs:
           repo_token: ${{ secrets.GITHUB_TOKEN }}
           action: "upload"
           app_location: "frontend"
-          api_location: "backend"
+          # APIは独立したAzure Functionsとしてデプロイするため、api_locationを空にする
+          api_location: ""
           output_location: ""
 
   close_pull_request_job:
