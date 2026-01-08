@@ -1,18 +1,17 @@
 {
-    "routes": [
-      {
-        "route": "/api/*",
-        "rewrite": "/api"
-      }
-    ],
-    "navigationFallback": {
-      "rewrite": "/index.html",
-      "exclude": [
-        "/api/*",
-        "/login.html",
-        "/admin.html",
-        "*.{css,scss,js,png,gif,ico,jpg,svg,woff,woff2,ttf,eot}"
-      ]
+  "routes": [
+    {
+      "route": "/api/*",
+      "allowedRoles": ["anonymous"]
     }
+  ],
+  "navigationFallback": {
+    "rewrite": "/index.html",
+    "exclude": [
+      "/api/*",
+      "/login.html",
+      "/admin.html",
+      "*.{css,scss,js,png,gif,ico,jpg,svg,woff,woff2,ttf,eot}"
+    ]
   }
-  
+}
