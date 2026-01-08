@@ -20,8 +20,13 @@ from app.api import health, chat, admin
 setup_logging()
 logger = logging.getLogger(__name__)
 
-# 設定取得
-settings = get_settings()
+# 設定取得（エラーハンドリング付き）
+try:
+    settings = get_settings()
+    allowed_origins = settings.allowed_origins_list
+except Exception as e:
+    logger.warning(f"設定の読み込みに失敗しました（デフォルト値を使用）: {str(e)}")
+    allowed_origins = ["*"]  # デフォルトで全てのオリジンを許可
 
 # FastAPIアプリケーション作成
 app = FastAPI(
@@ -33,16 +38,17 @@ app = FastAPI(
 # CORS設定
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=settings.allowed_origins_list,
+    allow_origins=allowed_origins,
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
 )
 
-# ルーター登録
-app.include_router(health.router, prefix="/api", tags=["Health"])
-app.include_router(chat.router, prefix="/api", tags=["Chat"])
-app.include_router(admin.router, prefix="/api/admin", tags=["Admin"])
+# ルーター登録（Azure Functionsの/apiプレフィックスが自動的に追加されるため、ここでは/apiを追加しない）
+# route: "{*route}"の場合、/api/healthへのリクエストは/healthとしてFastAPIアプリに渡される
+app.include_router(health.router, tags=["Health"])
+app.include_router(chat.router, tags=["Chat"])
+app.include_router(admin.router, prefix="/admin", tags=["Admin"])
 
 
 def main(req: func.HttpRequest, context: func.Context) -> func.HttpResponse:
